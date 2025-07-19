@@ -229,12 +229,17 @@ async function handlePaymentSucceeded(invoice) {
     try {
       const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
       
+      // Generate new auth code for successful payment
+      const newAuthCode = generateAuthCode();
+      console.log(`🔢 Generated new auth code for successful payment: ${newAuthCode}`);
+      
       const { error } = await supabase
         .from('subscribers')
         .update({ 
           is_active: true,
           subscribed: true,
           subscription_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          auth_code: newAuthCode,
           updated_at: new Date().toISOString()
         })
         .eq('stripe_customer_id', subscription.customer);
@@ -332,6 +337,12 @@ async function upsertSubscriber(email, stripeCustomerId, subscriptionTier, subsc
       updated_at: new Date().toISOString()
     };
 
+    // Generate a random 6-digit auth code for new/active subscriptions
+    if (isActive) {
+      subscriberData.auth_code = generateAuthCode();
+      console.log(`🔢 Generated auth code for ${email}: ${subscriberData.auth_code}`);
+    }
+
     if (subscriptionEnd) {
       subscriberData.subscription_end = subscriptionEnd.toISOString();
     }
@@ -350,6 +361,11 @@ async function upsertSubscriber(email, stripeCustomerId, subscriptionTier, subsc
     console.error('❌ Error upserting subscriber:', error);
     throw error;
   }
+}
+
+// Generate random 6-digit auth code
+function generateAuthCode() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 // Helper function to get plan name from price ID
