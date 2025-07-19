@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opt-In Form Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="email"], input[type="tel"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+        .hidden {
+            display: none;
+        }
+        .test-info {
+            background-color: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #b3d9ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="test-info">
+            <h3>🧪 Opt-In Form Test Page</h3>
+            <p>This page tests the Supabase integration for your opt-in form. Fill out the form below and check your Supabase dashboard to verify the data is being saved.</p>
+        </div>
+
+        <h1>Gen X Shred - Opt-In Test</h1>
+        
+        <div id="success-message" class="success hidden">
+            <strong>🎉 Success!</strong> Your opt-in has been saved to Supabase!
+        </div>
+        
+        <div id="error-message" class="error hidden">
+            <strong>❌ Error:</strong> <span id="error-text"></span>
+        </div>
+
+        <form id="wf-form-Opt-In-Form">
+            <div class="form-group">
+                <label for="First-Name">First Name *</label>
+                <input type="text" id="First-Name" name="First-Name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="Last-Name">Last Name *</label>
+                <input type="text" id="Last-Name" name="Last-Name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="Email">Email Address *</label>
+                <input type="email" id="Email" name="Email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="Phone-Number">Phone Number *</label>
+                <input type="tel" id="Phone-Number" name="Phone-Number" required>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="Opt-In-Checkbox" name="Opt-In-Checkbox" required>
+                    <label for="Opt-In-Checkbox">I agree to receive offers and accept the Terms of Service & Privacy Policy *</label>
+                </div>
+            </div>
+
+            <button type="submit" id="submit-btn">Continue</button>
+            <button type="button" class="button is-secondary" onclick="alert('Skip functionality works!')">Skip</button>
+        </form>
+
+        <div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 5px;">
+            <h3>📋 Testing Checklist:</h3>
+            <ol>
+                <li>Fill out all required fields</li>
+                <li>Check the opt-in checkbox</li>
+                <li>Click "Continue"</li>
+                <li>Check for success message</li>
+                <li>Go to your Supabase dashboard → Table Editor → opt_in_submissions</li>
+                <li>Verify your submission appears in the table</li>
+            </ol>
+            
+            <h3>🔧 Debug Info:</h3>
+            <p><strong>Supabase URL:</strong> <span id="debug-url">Loading...</span></p>
+            <p><strong>Supabase Key:</strong> <span id="debug-key">Loading...</span></p>
+            <p><strong>Form Handler:</strong> <span id="debug-handler">Loading...</span></p>
+        </div>
+    </div>
+
+    <!-- Supabase JavaScript SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Supabase Configuration -->
+    <script src="js/supabase-config.js"></script>
+    <!-- Opt-In Form Handler -->
+    <script src="js/opt-in-form-handler.js"></script>
+
+    <script>
+        // Debug information
+        setTimeout(() => {
+            document.getElementById('debug-url').textContent = window.SUPABASE_CONFIG?.url || 'Not configured';
+            document.getElementById('debug-key').textContent = window.SUPABASE_CONFIG?.anonKey ? 'Configured ✓' : 'Not configured';
+            document.getElementById('debug-handler').textContent = typeof OptInFormHandler !== 'undefined' ? 'Loaded ✓' : 'Not loaded';
+        }, 100);
+
+        // Override the showSuccess method to show our custom message
+        if (typeof OptInFormHandler !== 'undefined') {
+            const originalShowSuccess = OptInFormHandler.prototype.showSuccess;
+            OptInFormHandler.prototype.showSuccess = function() {
+                document.getElementById('success-message').classList.remove('hidden');
+                document.getElementById('error-message').classList.add('hidden');
+                document.querySelector('form').style.display = 'none';
+            };
+
+            const originalShowError = OptInFormHandler.prototype.showError;
+            OptInFormHandler.prototype.showError = function(message) {
+                document.getElementById('error-text').textContent = message;
+                document.getElementById('error-message').classList.remove('hidden');
+                document.getElementById('success-message').classList.add('hidden');
+            };
+        }
+    </script>
+</body>
+</html>

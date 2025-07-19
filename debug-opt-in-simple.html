@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Opt-In Form - Simple Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f0f0f0;
+            color: #333;
+        }
+        .debug-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="email"], input[type="tel"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        button {
+            background: #007cba;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #005a87;
+        }
+        .debug-log {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>Debug Opt-In Form - Simple Test</h1>
+        <p>This is a minimal test to debug the opt-in form functionality.</p>
+
+        <form id="debug-form">
+            <div class="form-group">
+                <label for="first_name">First Name:</label>
+                <input type="text" id="first_name" name="first_name" value="John" required>
+            </div>
+
+            <div class="form-group">
+                <label for="last_name">Last Name:</label>
+                <input type="text" id="last_name" name="last_name" value="Doe" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="john.doe@example.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone:</label>
+                <input type="tel" id="phone" name="phone" value="+1 (555) 123-4567" required>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="consent" name="consent" checked required>
+                    I agree to receive communications
+                </label>
+            </div>
+
+            <button type="submit">Test Submit</button>
+        </form>
+
+        <div id="result"></div>
+        <div class="debug-log" id="debug-log">Debug log will appear here...\n</div>
+    </div>
+
+    <!-- Supabase JavaScript SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Supabase Configuration -->
+    <script src="js/supabase-config.js"></script>
+
+    <script>
+        let debugLog = '';
+
+        function log(message) {
+            debugLog += new Date().toLocaleTimeString() + ': ' + message + '\n';
+            document.getElementById('debug-log').textContent = debugLog;
+            console.log(message);
+        }
+
+        function showResult(message, isError = false) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = isError ? 'error' : 'success';
+            resultDiv.textContent = message;
+        }
+
+        // Initialize and test Supabase connection
+        async function testSupabase() {
+            log('Testing Supabase connection...');
+            
+            if (!window.SUPABASE_CONFIG) {
+                log('ERROR: SUPABASE_CONFIG not found');
+                return false;
+            }
+
+            log('SUPABASE_CONFIG found: ' + JSON.stringify({
+                url: window.SUPABASE_CONFIG.url ? 'SET' : 'MISSING',
+                anonKey: window.SUPABASE_CONFIG.anonKey ? 'SET' : 'MISSING'
+            }));
+
+            try {
+                const supabase = window.supabase.createClient(
+                    window.SUPABASE_CONFIG.url,
+                    window.SUPABASE_CONFIG.anonKey
+                );
+                log('Supabase client created successfully');
+
+                // Test basic connection
+                const { data, error } = await supabase
+                    .from('opt_in_submissions')
+                    .select('count')
+                    .limit(1);
+
+                if (error) {
+                    log('ERROR: Supabase connection test failed: ' + error.message);
+                    return false;
+                } else {
+                    log('SUCCESS: Supabase connection test passed');
+                    return supabase;
+                }
+            } catch (error) {
+                log('ERROR: Failed to create Supabase client: ' + error.message);
+                return false;
+            }
+        }
+
+        // Form submission handler
+        document.getElementById('debug-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            log('Form submission started');
+
+            const supabase = await testSupabase();
+            if (!supabase) {
+                showResult('Supabase connection failed - check debug log', true);
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const data = {
+                first_name: formData.get('first_name'),
+                last_name: formData.get('last_name'),
+                email: formData.get('email'),
+                phone_number: formData.get('phone'),
+                opted_in: formData.get('consent') ? true : false,
+                user_agent: navigator.userAgent,
+                submitted_at: new Date().toISOString()
+            };
+
+            log('Form data prepared: ' + JSON.stringify(data, null, 2));
+
+            try {
+                log('Attempting to insert data into Supabase...');
+                const { data: result, error } = await supabase
+                    .from('opt_in_submissions')
+                    .insert([data]);
+
+                if (error) {
+                    log('ERROR: Supabase insert failed: ' + error.message);
+                    showResult('Failed to save: ' + error.message, true);
+                } else {
+                    log('SUCCESS: Data inserted successfully');
+                    showResult('Success! Data saved to Supabase database.');
+                    
+                    // Update email for next test
+                    const emailField = document.getElementById('email');
+                    const currentEmail = emailField.value;
+                    const timestamp = Date.now();
+                    emailField.value = currentEmail.replace('@', `+${timestamp}@`);
+                }
+            } catch (error) {
+                log('ERROR: Unexpected error: ' + error.message);
+                showResult('Unexpected error: ' + error.message, true);
+            }
+        });
+
+        // Run initial test when page loads
+        window.addEventListener('load', async function() {
+            log('Page loaded, running initial tests...');
+            await testSupabase();
+        });
+    </script>
+</body>
+</html>

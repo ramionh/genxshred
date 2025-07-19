@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Gen X Shred - Opt In</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&family=Barlow:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="images/favicon-32.png" rel="shortcut icon" type="image/x-icon" />
+    <link href="images/app-icon.png" rel="apple-touch-icon" />
+    
+    <style>
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -o-font-smoothing: antialiased;
+            -webkit-appearance: none;
+            appearance: none;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Barlow', Arial, sans-serif;
+            background-color: #111;
+            color: #fff;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        .header {
+            background-image: url('images/hero-bg.jpg');
+            background-size: cover;
+            background-position: center center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1;
+        }
+        
+        /* Navigation */
+        .navbar {
+            position: relative;
+            z-index: 10;
+            padding: 20px 0;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            height: 50px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: #ffd700;
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, #ffd700, #ff6b35);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            color: #000;
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        
+        .mobile-menu span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+        
+        /* Hero Content */
+        .hero-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            padding: 60px 0;
+        }
+        
+        .hero-text h1 {
+            font-family: 'Bebas Neue', Arial, sans-serif;
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ffd700, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-text p {
+            font-size: 1.25rem;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Form Section */
+        .form-section {
+            background: #111;
+            padding: 80px 0;
+        }
+        
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .form-container h2 {
+            font-family: 'Bebas Neue', Arial, sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        
+        .form-container p {
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            color: #ccc;
+        }
+        
+        /* Form Styles */
+        .opt-in-form {
+            background: #222;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #fff;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #333;
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+        
+        .form-group input::placeholder {
+            color: #888;
+        }
+        
+        /* Custom Checkbox Styles */
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        /* Hide the default checkbox */
+        .checkbox-group input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        
+        /* Create a custom checkbox */
+        .checkbox-group .checkmark {
+            position: relative;
+            height: 20px;
+            width: 20px;
+            background-color: #333;
+            border: 2px solid #666;
+            border-radius: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        /* On mouse-over, add a grey background color */
+        .checkbox-group:hover input ~ .checkmark {
+            background-color: #444;
+            border-color: #ffd700;
+        }
+        
+        /* When the checkbox is checked, add a gold background */
+        .checkbox-group input:checked ~ .checkmark {
+            background-color: #ffd700;
+            border-color: #ffd700;
+        }
+        
+        /* Create the checkmark/indicator (hidden when not checked) */
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+        
+        /* Show the checkmark when checked */
+        .checkbox-group input:checked ~ .checkmark:after {
+            display: block;
+        }
+        
+        /* Style the checkmark/indicator */
+        .checkbox-group .checkmark:after {
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid #000;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+        
+        .checkbox-group label {
+            margin: 0;
+            color: #ccc;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .checkbox-group a {
+            color: #ffd700;
+            text-decoration: none;
+        }
+        
+        .checkbox-group a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Button Styles */
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ffd700, #ff6b35);
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.7;
+            transform: none;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 2px solid #444;
+        }
+        
+        .btn-secondary:hover {
+            border-color: #ffd700;
+            color: #ffd700;
+        }
+        
+        /* Message Styles */
+        .message {
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .message.success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid #28a745;
+            color: #fff;
+        }
+        
+        .message.error {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid #dc3545;
+            color: #fff;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #000;
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .footer-quote h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .footer-quote p {
+            color: #ccc;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: #ffd700;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: #ffd700;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(17, 17, 17, 0.95);
+                flex-direction: column;
+                padding: 20px;
+                gap: 20px;
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .mobile-menu {
+                display: flex;
+            }
+            
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-text p {
+                font-size: 1.1rem;
+            }
+            
+            .opt-in-form {
+                padding: 30px 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer-links {
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+            
+            .form-container h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-container">
+                    <a href="index.html">
+                        <img src="images/image-2022.webp" alt="Gen X Shred Logo" class="logo">
+                    </a>
+                    <ul class="nav-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="coaching.html">Coaching</a></li>
+                        <li><a href="opt-in.html">Opt-In</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms-service.html">Terms of Service</a></li>
+                        <li><a href="coaching.html" class="cta-button">Join Now</a></li>
+                    </ul>
+                    <div class="mobile-menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Content -->
+        <div class="hero-content">
+            <div class="container">
+                <div class="hero-text">
+                    <h1>Transform Your Life</h1>
+                    <p>Join thousands of Gen Xers who have discovered the secret to sustainable fitness, energy, and confidence after 40.</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Opt-In Form Section -->
+    <section class="form-section">
+        <div class="container">
+            <div class="form-container">
+                <h2>Get Exclusive Access</h2>
+                <p>Join our community and receive personalized fitness tips, exclusive workout plans, and special offers designed specifically for Gen X.</p>
+
+                <!-- Success Message -->
+                <div id="success-message" class="message success">
+                    <h3>🎉 Welcome to Gen X Shred!</h3>
+                    <p>You've successfully opted in to receive our exclusive fitness tips, workout plans, and special offers. Check your email for a welcome message!</p>
+                </div>
+
+                <!-- Error Message -->
+                <div id="error-message" class="message error">
+                    <h3>❌ Oops!</h3>
+                    <p id="error-text">Something went wrong. Please try again.</p>
+                </div>
+
+                <!-- Opt-In Form -->
+                <form id="wf-form-Opt-In-Form" class="opt-in-form">
+                    <div class="form-group">
+                        <label for="First-Name">First Name *</label>
+                        <input type="text" id="First-Name" name="First-Name" placeholder="Enter your first name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Last-Name">Last Name *</label>
+                        <input type="text" id="Last-Name" name="Last-Name" placeholder="Enter your last name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Email">Email Address *</label>
+                        <input type="email" id="Email" name="Email" placeholder="your.email@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Phone-Number">Phone Number *</label>
+                        <input type="tel" id="Phone-Number" name="Phone-Number" placeholder="+1 (555) 123-4567" required>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="Opt-In-Checkbox" name="Opt-In-Checkbox" required>
+                        <span class="checkmark"></span>
+                        <label for="Opt-In-Checkbox">
+                            I would like to receive exclusive fitness tips, workout plans, and special offers. I accept the 
+                            <a href="terms-service.html" target="_blank">Terms of Service</a> and 
+                            <a href="privacy.html" target="_blank">Privacy Policy</a>.
+                        </label>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" id="submit-btn" class="btn btn-primary">
+                            Continue
+                        </button>
+                        <a href="#" id="skip-btn" class="btn btn-secondary">Skip</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-quote">
+                    <h3>"There is nothing impossible to him who will try."</h3>
+                    <p>Alexander the Great</p>
+                </div>
+                <div class="footer-links">
+                    <a href="privacy.html">Privacy Policy</a>
+                    <a href="terms-service.html">Terms & Conditions</a>
+                    <a href="mailto:info@genxshred.com">Contact</a>
+                </div>
+                <div class="social-links">
+                    <a href="https://www.instagram.com/genxshred/" target="_blank" aria-label="Instagram">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16 3H8C5.23858 3 3 5.23858 3 8V16C3 18.7614 5.23858 21 8 21H16C18.7614 21 21 18.7614 21 16V8C21 5.23858 18.7614 3 16 3ZM19.25 16C19.2445 17.7926 17.7926 19.2445 16 19.25H8C6.20735 19.2445 4.75549 17.7926 4.75 16V8C4.75549 6.20735 6.20735 4.75549 8 4.75H16C17.7926 4.75549 19.2445 6.20735 19.25 8V16ZM16.75 8.25C17.3023 8.25 17.75 7.80228 17.75 7.25C17.75 6.69772 17.3023 6.25 16.75 6.25C16.1977 6.25 15.75 6.69772 15.75 7.25C15.75 7.80228 16.1977 8.25 16.75 8.25ZM12 7.5C9.51472 7.5 7.5 9.51472 7.5 12C7.5 14.4853 9.51472 16.5 12 16.5C14.4853 16.5 16.5 14.4853 16.5 12C16.5027 10.8057 16.0294 9.65957 15.1849 8.81508C14.3404 7.97059 13.1943 7.49734 12 7.5ZM9.25 12C9.25 13.5188 10.4812 14.75 12 14.75C13.5188 14.75 14.75 13.5188 14.75 12C14.75 10.4812 13.5188 9.25 12 9.25C10.4812 9.25 9.25 10.4812 9.25 12Z"/>
+                        </svg>
+                    </a>
+                    <a href="#" aria-label="Facebook">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M22 12.0611C22 6.50451 17.5229 2 12 2C6.47715 2 2 6.50451 2 12.0611C2 17.0828 5.65684 21.2452 10.4375 22V14.9694H7.89844V12.0611H10.4375V9.84452C10.4375 7.32296 11.9305 5.93012 14.2146 5.93012C15.3088 5.93012 16.4531 6.12663 16.4531 6.12663V8.60261H15.1922C13.95 8.60261 13.5625 9.37822 13.5625 10.1739V12.0611H16.3359L15.8926 14.9694H13.5625V22C18.3432 21.2452 22 17.083 22 12.0611Z"/>
+                        </svg>
+                    </a>
+                    <a href="#" aria-label="Twitter">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.9728 6.7174C20.5084 7.33692 19.947 7.87733 19.3103 8.31776C19.3103 8.47959 19.3103 8.64142 19.3103 8.81225C19.3154 11.7511 18.1415 14.5691 16.0518 16.6345C13.962 18.6999 11.1312 19.8399 8.19405 19.7989C6.49599 19.8046 4.81967 19.4169 3.29642 18.6661C3.21428 18.6302 3.16131 18.549 3.16162 18.4593V18.3604C3.16162 18.2313 3.26623 18.1267 3.39527 18.1267C5.06442 18.0716 6.67402 17.4929 7.99634 16.4724C6.48553 16.4419 5.12619 15.5469 4.5006 14.1707C4.46901 14.0956 4.47884 14.0093 4.52657 13.9432C4.57429 13.8771 4.653 13.8407 4.73425 13.8471C5.19342 13.8932 5.65718 13.8505 6.1002 13.7212C4.43239 13.375 3.17921 11.9904 2.99986 10.2957C2.99349 10.2144 3.02992 10.1357 3.096 10.0879C3.16207 10.0402 3.24824 10.0303 3.32338 10.062C3.77094 10.2595 4.25409 10.3635 4.74324 10.3676C3.28184 9.40846 2.65061 7.58405 3.20655 5.92622C3.26394 5.76513 3.40181 5.64612 3.5695 5.61294C3.73718 5.57975 3.90996 5.63728 4.02432 5.76439C5.99639 7.86325 8.70604 9.11396 11.5819 9.25279C11.5083 8.95885 11.4721 8.65676 11.4741 8.35372C11.501 6.76472 12.4842 5.34921 13.9634 4.76987C15.4425 4.19054 17.1249 4.56203 18.223 5.71044C18.9714 5.56785 19.695 5.31645 20.3707 4.96421C20.4202 4.93331 20.483 4.93331 20.5325 4.96421C20.5634 5.01373 20.5634 5.07652 20.5325 5.12604C20.2052 5.87552 19.6523 6.50412 18.9509 6.92419C19.5651 6.85296 20.1685 6.70807 20.7482 6.49264C20.797 6.45942 20.8611 6.45942 20.9099 6.49264C20.9508 6.51134 20.9814 6.54711 20.9935 6.59042C21.0056 6.63373 20.998 6.68018 20.9728 6.7174Z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Supabase JavaScript SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Supabase Configuration -->
+    <script src="js/supabase-config.js"></script>
+    
+    <!-- Custom Form Handler (No Webflow dependencies) -->
+    <script>
+        class CleanOptInHandler {
+            constructor() {
+                this.supabaseUrl = window.SUPABASE_CONFIG?.url || '';
+                this.supabaseKey = window.SUPABASE_CONFIG?.anonKey || '';
+                this.supabase = null;
+                this.form = null;
+                this.submitButton = null;
+                this.skipButton = null;
+                
+                this.init();
+            }
+
+            init() {
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', () => this.setupForm());
+                } else {
+                    this.setupForm();
+                }
+            }
+
+            async initSupabase() {
+                if (!this.supabaseUrl || !this.supabaseKey) {
+                    console.error('Supabase URL and key must be configured');
+                    return false;
+                }
+
+                try {
+                    this.supabase = supabase.createClient(this.supabaseUrl, this.supabaseKey);
+                    return true;
+                } catch (error) {
+                    console.error('Failed to initialize Supabase:', error);
+                    return false;
+                }
+            }
+
+            setupForm() {
+                this.form = document.getElementById('wf-form-Opt-In-Form');
+                this.submitButton = document.getElementById('submit-btn');
+                this.skipButton = document.getElementById('skip-btn');
+
+                if (!this.form) {
+                    console.error('Opt-in form not found');
+                    return;
+                }
+
+                // Add form submission handler
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+
+                // Add skip button handler
+                if (this.skipButton) {
+                    this.skipButton.addEventListener('click', (e) => this.handleSkip(e));
+                }
+
+                // Custom checkbox functionality
+                this.setupCustomCheckbox();
+
+                // Mobile menu toggle
+                const mobileMenu = document.querySelector('.mobile-menu');
+                const navLinks = document.querySelector('.nav-links');
+                
+                if (mobileMenu && navLinks) {
+                    mobileMenu.addEventListener('click', () => {
+                        navLinks.classList.toggle('active');
+                    });
+                }
+            }
+
+            setupCustomCheckbox() {
+                const checkbox = document.getElementById('Opt-In-Checkbox');
+                const checkmark = document.querySelector('.checkmark');
+                const label = document.querySelector('label[for="Opt-In-Checkbox"]');
+
+                if (checkbox && checkmark) {
+                    // Click on checkmark toggles checkbox
+                    checkmark.addEventListener('click', () => {
+                        checkbox.checked = !checkbox.checked;
+                    });
+
+                    // Click on label toggles checkbox (this should work by default, but let's make sure)
+                    if (label) {
+                        label.addEventListener('click', (e) => {
+                            // Only toggle if clicking on the label text, not the links inside
+                            if (e.target === label) {
+                                checkbox.checked = !checkbox.checked;
+                            }
+                        });
+                    }
+                }
+            }
+
+            async handleSubmit(event) {
+                event.preventDefault();
+                
+                if (!await this.initSupabase()) {
+                    this.showError('Configuration error. Please try again later.');
+                    return;
+                }
+
+                const formData = this.getFormData();
+                
+                const validation = this.validateForm(formData);
+                if (!validation.isValid) {
+                    this.showError(validation.message);
+                    return;
+                }
+
+                this.setLoadingState(true);
+
+                try {
+                    await this.saveToSupabase(formData);
+                    this.showSuccess();
+                    
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                    
+                    if (error.message.includes('duplicate') || error.message.includes('unique')) {
+                        this.showError('This email is already registered. Thank you for your interest!');
+                    } else {
+                        this.showError('Failed to process your opt-in. Please try again.');
+                    }
+                } finally {
+                    this.setLoadingState(false);
+                }
+            }
+
+            handleSkip(event) {
+                event.preventDefault();
+                console.log('User skipped opt-in');
+                alert('You can always opt-in later. Redirecting to our coaching page...');
+                // Uncomment to redirect: window.location.href = 'coaching.html';
+            }
+
+            getFormData() {
+                const formData = new FormData(this.form);
+                return {
+                    first_name: formData.get('First-Name')?.trim() || '',
+                    last_name: formData.get('Last-Name')?.trim() || '',
+                    email: formData.get('Email')?.trim() || '',
+                    phone_number: formData.get('Phone-Number')?.trim() || '',
+                    opted_in: formData.get('Opt-In-Checkbox') ? true : false,
+                    user_agent: navigator.userAgent,
+                    submitted_at: new Date().toISOString()
+                };
+            }
+
+            validateForm(data) {
+                if (!data.first_name) return { isValid: false, message: 'Please enter your first name.' };
+                if (!data.last_name) return { isValid: false, message: 'Please enter your last name.' };
+                if (!data.email) return { isValid: false, message: 'Please enter your email address.' };
+                if (!data.phone_number) return { isValid: false, message: 'Please enter your phone number.' };
+                if (!data.opted_in) return { isValid: false, message: 'Please accept the Terms of Service and Privacy Policy.' };
+
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(data.email)) {
+                    return { isValid: false, message: 'Please enter a valid email address.' };
+                }
+
+                const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,}$/;
+                if (!phoneRegex.test(data.phone_number)) {
+                    return { isValid: false, message: 'Please enter a valid phone number.' };
+                }
+
+                if (data.first_name.length < 2 || data.last_name.length < 2) {
+                    return { isValid: false, message: 'Names must be at least 2 characters long.' };
+                }
+
+                return { isValid: true };
+            }
+
+            async saveToSupabase(data) {
+                const { data: result, error } = await this.supabase
+                    .from('opt_in_submissions')
+                    .insert([{
+                        first_name: data.first_name,
+                        last_name: data.last_name,
+                        email: data.email,
+                        phone_number: data.phone_number,
+                        opted_in: data.opted_in,
+                        user_agent: data.user_agent,
+                        submitted_at: data.submitted_at
+                    }]);
+
+                if (error) {
+                    throw new Error(`Supabase error: ${error.message}`);
+                }
+
+                return result;
+            }
+
+            setLoadingState(isLoading) {
+                if (!this.submitButton) return;
+
+                if (isLoading) {
+                    this.submitButton.textContent = 'Processing...';
+                    this.submitButton.disabled = true;
+                    this.submitButton.style.opacity = '0.7';
+                } else {
+                    this.submitButton.textContent = 'Continue';
+                    this.submitButton.disabled = false;
+                    this.submitButton.style.opacity = '1';
+                }
+            }
+
+            showSuccess() {
+                this.hideMessages();
+                const successDiv = document.getElementById('success-message');
+                if (successDiv) {
+                    successDiv.style.display = 'block';
+                    successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                
+                // Hide the form after success
+                if (this.form) {
+                    this.form.style.display = 'none';
+                }
+            }
+
+            showError(message) {
+                this.hideMessages();
+                const errorDiv = document.getElementById('error-message');
+                const errorText = document.getElementById('error-text');
+                
+                if (errorDiv && errorText) {
+                    errorText.textContent = message;
+                    errorDiv.style.display = 'block';
+                    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+
+                setTimeout(() => this.hideMessages(), 7000);
+            }
+
+            hideMessages() {
+                const successDiv = document.getElementById('success-message');
+                const errorDiv = document.getElementById('error-message');
+                
+                if (successDiv) successDiv.style.display = 'none';
+                if (errorDiv) errorDiv.style.display = 'none';
+            }
+        }
+
+        // Initialize the clean opt-in handler
+        new CleanOptInHandler();
+    </script>
+</body>
+
+</html>

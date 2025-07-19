@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra Simple Form Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 400px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, button { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #007cba; color: white; font-size: 16px; cursor: pointer; }
+        button:hover { background: #005a87; }
+        .log { background: #f8f8f8; padding: 15px; margin-top: 20px; border-radius: 5px; white-space: pre-wrap; font-family: monospace; }
+        .success { background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-top: 20px; }
+        .error { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Ultra Simple Form Test</h2>
+        <p><strong>Step 1:</strong> Check if Supabase loads</p>
+        <div id="step1-result">Loading...</div>
+        
+        <p><strong>Step 2:</strong> Check if config loads</p>
+        <div id="step2-result">Loading...</div>
+        
+        <p><strong>Step 3:</strong> Test form submission</p>
+        <form id="test-form">
+            <div class="form-group">
+                <label>First Name:</label>
+                <input type="text" name="first_name" value="Test" required>
+            </div>
+            <div class="form-group">
+                <label>Last Name:</label>
+                <input type="text" name="last_name" value="User" required>
+            </div>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>Phone:</label>
+                <input type="tel" name="phone" value="+1 (555) 123-4567" required>
+            </div>
+            <button type="submit" id="submit-btn">Test Submit</button>
+        </form>
+        
+        <div id="result"></div>
+        <div id="log" class="log"></div>
+    </div>
+
+    <!-- Load Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+
+    <script>
+        let logContent = '';
+        
+        function log(message) {
+            logContent += new Date().toLocaleTimeString() + ': ' + message + '\n';
+            document.getElementById('log').textContent = logContent;
+            console.log(message);
+        }
+
+        function setResult(elementId, message, isError = false) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.style.color = isError ? '#721c24' : '#155724';
+        }
+
+        function setFormResult(message, isError = false) {
+            const el = document.getElementById('result');
+            el.className = isError ? 'error' : 'success';
+            el.textContent = message;
+        }
+
+        // Generate a unique email for testing
+        function generateTestEmail() {
+            const timestamp = Date.now();
+            return `test+${timestamp}@example.com`;
+        }
+
+        // Step 1: Check if Supabase JS library loaded
+        setTimeout(() => {
+            if (typeof window.supabase !== 'undefined') {
+                setResult('step1-result', '✅ Supabase library loaded');
+                log('Supabase library is available');
+            } else {
+                setResult('step1-result', '❌ Supabase library not loaded', true);
+                log('ERROR: Supabase library not found');
+            }
+        }, 1000);
+
+        // Step 2: Check if config loaded
+        setTimeout(() => {
+            if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.SUPABASE_CONFIG.anonKey) {
+                setResult('step2-result', '✅ Supabase config loaded');
+                log('Supabase config is available');
+                log('URL: ' + window.SUPABASE_CONFIG.url);
+                log('Key: ' + (window.SUPABASE_CONFIG.anonKey ? 'Present' : 'Missing'));
+            } else {
+                setResult('step2-result', '❌ Supabase config not loaded', true);
+                log('ERROR: Supabase config not found or incomplete');
+            }
+        }, 1500);
+
+        // Step 3: Form submission
+        document.getElementById('test-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            log('Form submitted');
+
+            // Set unique email
+            const emailField = document.querySelector('input[name="email"]');
+            if (!emailField.value || emailField.value === '') {
+                emailField.value = generateTestEmail();
+            }
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.textContent = 'Testing...';
+            submitBtn.disabled = true;
+
+            try {
+                // Check prerequisites
+                if (!window.supabase) {
+                    throw new Error('Supabase library not available');
+                }
+
+                if (!window.SUPABASE_CONFIG) {
+                    throw new Error('Supabase config not available');
+                }
+
+                // Create Supabase client
+                log('Creating Supabase client...');
+                const supabase = window.supabase.createClient(
+                    window.SUPABASE_CONFIG.url,
+                    window.SUPABASE_CONFIG.anonKey
+                );
+
+                // Prepare data
+                const formData = new FormData(e.target);
+                const data = {
+                    first_name: formData.get('first_name'),
+                    last_name: formData.get('last_name'),
+                    email: formData.get('email'),
+                    phone_number: formData.get('phone'),
+                    opted_in: true,
+                    user_agent: navigator.userAgent,
+                    submitted_at: new Date().toISOString()
+                };
+
+                log('Data to submit: ' + JSON.stringify(data, null, 2));
+
+                // Submit to Supabase
+                log('Submitting to Supabase...');
+                const { data: result, error } = await supabase
+                    .from('opt_in_submissions')
+                    .insert([data]);
+
+                if (error) {
+                    throw new Error('Supabase error: ' + error.message);
+                }
+
+                log('SUCCESS: Data submitted successfully');
+                setFormResult('✅ Success! Data saved to Supabase database.');
+                
+                // Generate new email for next test
+                emailField.value = generateTestEmail();
+
+            } catch (error) {
+                log('ERROR: ' + error.message);
+                setFormResult('❌ Error: ' + error.message, true);
+            } finally {
+                submitBtn.textContent = 'Test Submit';
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Set initial test email
+        window.addEventListener('load', () => {
+            document.querySelector('input[name="email"]').value = generateTestEmail();
+        });
+    </script>
+</body>
+</html>

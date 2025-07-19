@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Main Opt-In Form</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, button { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #007cba; color: white; font-size: 16px; cursor: pointer; }
+        button:hover { background: #005a87; }
+        .log { background: #f8f8f8; padding: 15px; margin-top: 20px; border-radius: 5px; white-space: pre-wrap; font-family: monospace; max-height: 400px; overflow-y: auto; }
+        .success { background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-top: 20px; }
+        .error { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-top: 20px; }
+        .checkbox-group { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+        .checkbox-group input[type="checkbox"] { width: auto; margin: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Debug Main Opt-In Form</h2>
+        <p>This tests the exact same form structure as the main opt-in.html</p>
+
+        <!-- This form uses the EXACT same structure and names as the main opt-in form -->
+        <form id="wf-form-Opt-In-Form">
+            <div class="form-group">
+                <label for="First-Name">First Name *</label>
+                <input type="text" id="First-Name" name="First-Name" placeholder="Enter your first name" value="Test" required>
+            </div>
+
+            <div class="form-group">
+                <label for="Last-Name">Last Name *</label>
+                <input type="text" id="Last-Name" name="Last-Name" placeholder="Enter your last name" value="User" required>
+            </div>
+
+            <div class="form-group">
+                <label for="Email">Email Address *</label>
+                <input type="email" id="Email" name="Email" placeholder="your.email@example.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="Phone-Number">Phone Number *</label>
+                <input type="tel" id="Phone-Number" name="Phone-Number" placeholder="+1 (555) 123-4567" value="+1 (555) 123-4567" required>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="Opt-In-Checkbox" name="Opt-In-Checkbox" checked required>
+                <label for="Opt-In-Checkbox">
+                    I would like to receive exclusive fitness tips, workout plans, and special offers.
+                </label>
+            </div>
+
+            <button type="submit" id="submit-btn">Continue</button>
+        </form>
+        
+        <div id="result"></div>
+        <div id="log" class="log"></div>
+    </div>
+
+    <!-- Load Supabase (same as main form) -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+
+    <script>
+        let logContent = '';
+        
+        function log(message) {
+            logContent += new Date().toLocaleTimeString() + ': ' + message + '\n';
+            document.getElementById('log').textContent = logContent;
+            console.log(message);
+        }
+
+        function setFormResult(message, isError = false) {
+            const el = document.getElementById('result');
+            el.className = isError ? 'error' : 'success';
+            el.textContent = message;
+        }
+
+        // Generate a unique email for testing
+        function generateTestEmail() {
+            const timestamp = Date.now();
+            return `test+${timestamp}@example.com`;
+        }
+
+        // EXACT SAME HANDLER CLASS AS THE MAIN FORM
+        class CleanOptInHandler {
+            constructor() {
+                this.supabaseUrl = window.SUPABASE_CONFIG?.url || '';
+                this.supabaseKey = window.SUPABASE_CONFIG?.anonKey || '';
+                this.supabase = null;
+                this.form = null;
+                this.submitButton = null;
+                
+                log('CleanOptInHandler constructor called');
+                this.init();
+            }
+
+            init() {
+                log('CleanOptInHandler init() called');
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', () => this.setupForm());
+                } else {
+                    this.setupForm();
+                }
+            }
+
+            async initSupabase() {
+                log('initSupabase() called');
+                if (!this.supabaseUrl || !this.supabaseKey) {
+                    log('ERROR: Supabase URL and key must be configured');
+                    return false;
+                }
+
+                try {
+                    this.supabase = supabase.createClient(this.supabaseUrl, this.supabaseKey);
+                    log('Supabase client created successfully');
+                    return true;
+                } catch (error) {
+                    log('ERROR: Failed to initialize Supabase: ' + error.message);
+                    return false;
+                }
+            }
+
+            setupForm() {
+                log('setupForm() called');
+                this.form = document.getElementById('wf-form-Opt-In-Form');
+                this.submitButton = document.getElementById('submit-btn');
+
+                if (!this.form) {
+                    log('ERROR: Opt-in form not found');
+                    return;
+                }
+
+                log('Form found, adding event listener');
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            }
+
+            async handleSubmit(event) {
+                log('handleSubmit() called - Form submission started');
+                event.preventDefault();
+                
+                if (!await this.initSupabase()) {
+                    log('ERROR: Supabase initialization failed');
+                    setFormResult('Configuration error. Please try again later.', true);
+                    return;
+                }
+
+                const formData = this.getFormData();
+                log('Form data collected: ' + JSON.stringify(formData, null, 2));
+                
+                const validation = this.validateForm(formData);
+                if (!validation.isValid) {
+                    log('Form validation failed: ' + validation.message);
+                    setFormResult(validation.message, true);
+                    return;
+                }
+
+                log('Form validation passed');
+                this.setLoadingState(true);
+
+                try {
+                    log('Attempting to save to Supabase...');
+                    await this.saveToSupabase(formData);
+                    log('SUCCESS: Data saved to Supabase');
+                    
+                    setFormResult('✅ Success! Data saved to Supabase database.');
+                    
+                    // Generate new email for next test
+                    document.getElementById('Email').value = generateTestEmail();
+                    
+                } catch (error) {
+                    log('ERROR: Error submitting form: ' + error.message);
+                    
+                    if (error.message.includes('duplicate') || error.message.includes('unique')) {
+                        setFormResult('This email is already registered. Thank you for your interest!', true);
+                    } else {
+                        setFormResult('Failed to process your opt-in. Please try again.', true);
+                    }
+                } finally {
+                    this.setLoadingState(false);
+                }
+            }
+
+            getFormData() {
+                const formData = new FormData(this.form);
+                return {
+                    first_name: formData.get('First-Name')?.trim() || '',
+                    last_name: formData.get('Last-Name')?.trim() || '',
+                    email: formData.get('Email')?.trim() || '',
+                    phone_number: formData.get('Phone-Number')?.trim() || '',
+                    opted_in: formData.get('Opt-In-Checkbox') ? true : false,
+                    user_agent: navigator.userAgent,
+                    submitted_at: new Date().toISOString()
+                };
+            }
+
+            validateForm(data) {
+                if (!data.first_name) return { isValid: false, message: 'Please enter your first name.' };
+                if (!data.last_name) return { isValid: false, message: 'Please enter your last name.' };
+                if (!data.email) return { isValid: false, message: 'Please enter your email address.' };
+                if (!data.phone_number) return { isValid: false, message: 'Please enter your phone number.' };
+                if (!data.opted_in) return { isValid: false, message: 'Please accept the Terms of Service and Privacy Policy.' };
+
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(data.email)) {
+                    return { isValid: false, message: 'Please enter a valid email address.' };
+                }
+
+                return { isValid: true };
+            }
+
+            async saveToSupabase(data) {
+                const { data: result, error } = await this.supabase
+                    .from('opt_in_submissions')
+                    .insert([{
+                        first_name: data.first_name,
+                        last_name: data.last_name,
+                        email: data.email,
+                        phone_number: data.phone_number,
+                        opted_in: data.opted_in,
+                        user_agent: data.user_agent,
+                        submitted_at: data.submitted_at
+                    }]);
+
+                if (error) {
+                    throw new Error(`Supabase error: ${error.message}`);
+                }
+
+                return result;
+            }
+
+            setLoadingState(isLoading) {
+                if (!this.submitButton) return;
+
+                if (isLoading) {
+                    this.submitButton.textContent = 'Processing...';
+                    this.submitButton.disabled = true;
+                } else {
+                    this.submitButton.textContent = 'Continue';
+                    this.submitButton.disabled = false;
+                }
+            }
+        }
+
+        // Set initial test email
+        window.addEventListener('load', () => {
+            document.getElementById('Email').value = generateTestEmail();
+            log('Page loaded, initializing handler...');
+            new CleanOptInHandler();
+        });
+    </script>
+</body>
+</html>
