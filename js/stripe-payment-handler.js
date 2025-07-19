@@ -56,6 +56,10 @@ class StripePaymentHandler {
             // Show loading state
             this.setLoadingState(true);
 
+            // Debug logging
+            console.log('Creating checkout session for:', { priceId, planName });
+            console.log('Calling Netlify Function endpoint...');
+
             // Create checkout session using Netlify Function
             const response = await fetch('/.netlify/functions/create-checkout-session', {
                 method: 'POST',
@@ -68,12 +72,22 @@ class StripePaymentHandler {
                 })
             });
 
+            console.log('Response status:', response.status);
+            console.log('Response URL:', response.url);
+
             if (!response.ok) {
-                const errorData = await response.json();
+                let errorData;
+                try {
+                    errorData = await response.json();
+                } catch (e) {
+                    errorData = { error: `HTTP ${response.status}: ${response.statusText}` };
+                }
+                console.error('Server error:', errorData);
                 throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
             }
 
             const session = await response.json();
+            console.log('Session created successfully:', session);
 
             // Redirect to Stripe Checkout
             const result = await this.stripe.redirectToCheckout({
@@ -86,7 +100,15 @@ class StripePaymentHandler {
 
         } catch (error) {
             console.error('Error creating checkout session:', error);
-            this.showError(`Unable to process payment: ${error.message}. Please try again or contact support.`);
+            
+            // More specific error messages
+            if (error.message.includes('404')) {
+                this.showError('Payment system is being set up. Please try again in a few minutes or contact support.');
+            } else if (error.message.includes('Failed to fetch')) {
+                this.showError('Network connection error. Please check your internet connection and try again.');
+            } else {
+                this.showError(`Unable to process payment: ${error.message}. Please try again or contact support.`);
+            }
         } finally {
             this.setLoadingState(false);
         }

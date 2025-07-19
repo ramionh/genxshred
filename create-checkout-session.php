@@ -13,6 +13,7 @@ $stripeSecretKey = getenv('STRIPE_SECRET_KEY');
 if (!$stripeSecretKey) {
     // Fallback to $_ENV if getenv() doesn't work
     $stripeSecretKey = $_ENV['STRIPE_SECRET_KEY'] ?? null;
+    console.log('Stripe secret key not found in environment variables.');
 }
 
 if (!$stripeSecretKey) {
