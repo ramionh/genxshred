@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Stripe integration for Gen X Shred coaching plans",
   "dependencies": {
-    "stripe": "^14.0.0"
+    "stripe": "^14.0.0",
+    "@supabase/supabase-js": "^2.45.0"
   },
   "scripts": {
     "build": "echo 'No build step required'"
