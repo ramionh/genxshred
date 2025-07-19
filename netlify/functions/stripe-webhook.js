@@ -1,11 +1,15 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createClient } = require('@supabase/supabase-js');
+const EmailService = require('./email-service');
 
 // Initialize Supabase client
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY // Use service role key for server-side operations
 );
+
+// Initialize Email service
+const emailService = new EmailService();
 
 exports.handler = async (event, context) => {
   // Set CORS headers
@@ -96,73 +100,81 @@ exports.handler = async (event, context) => {
 
 // Handle successful checkout session
 async function handleCheckoutSessionCompleted(session) {
-  console.log('🎉 Checkout session completed:', session.id);
-  
-  const customerEmail = session.customer_details?.email || session.customer_email;
-  const customerName = session.customer_details?.name;
-  const customerId = session.customer;
-
-  if (!customerEmail) {
-    console.error('❌ No customer email found in session');
-    return;
-  }
-
   try {
-    // Get subscription details if it's a subscription
-    let subscriptionTier = 'one-time';
-    let subscriptionId = null;
+    console.log('🛒 Processing checkout session completion:', session.id);
     
-    if (session.mode === 'subscription' && session.subscription) {
-      const subscription = await stripe.subscriptions.retrieve(session.subscription);
-      subscriptionId = subscription.id;
-      
-      // Determine tier based on price
-      if (subscription.items.data.length > 0) {
-        const priceId = subscription.items.data[0].price.id;
-        subscriptionTier = getPlanNameFromPriceId(priceId);
-      }
+    const customerId = session.customer;
+    const customerEmail = session.customer_details?.email;
+    const subscriptionId = session.subscription;
+    
+    if (!customerEmail) {
+      console.log('⚠️ No customer email in session');
+      return;
     }
 
-    // Create or update profile
-    await upsertProfile(customerEmail, customerName, customerId);
-    
-    // Create or update subscriber
-    await upsertSubscriber(customerEmail, customerId, subscriptionTier, subscriptionId);
+    // Get customer details from Stripe
+    const customer = await stripe.customers.retrieve(customerId);
+    const customerName = customer.name || session.customer_details?.name;
 
-    console.log('✅ Successfully processed checkout session');
+    console.log(`👤 Customer: ${customerName} (${customerEmail})`);
+
+    // Get price information to determine subscription tier
+    const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
+    const priceId = lineItems.data[0]?.price?.id;
+    const subscriptionTier = getSubscriptionTier(priceId);
+
+    console.log(`💰 Subscription tier: ${subscriptionTier}`);
+
+    await upsertSubscriber(
+      customerEmail, 
+      customerId, 
+      subscriptionTier, 
+      subscriptionId, 
+      true, 
+      null, 
+      customerName
+    );
+    
   } catch (error) {
-    console.error('❌ Error processing checkout session:', error);
+    console.error('❌ Error handling checkout session completed:', error);
     throw error;
   }
 }
 
 // Handle subscription creation
 async function handleSubscriptionCreated(subscription) {
-  console.log('📝 Subscription created:', subscription.id);
-  
   try {
-    const customer = await stripe.customers.retrieve(subscription.customer);
+    console.log('� Processing subscription created:', subscription.id);
+    
+    const customerId = subscription.customer;
+    const customer = await stripe.customers.retrieve(customerId);
     const customerEmail = customer.email;
+    const customerName = customer.name;
     
     if (!customerEmail) {
-      console.error('❌ No customer email found');
+      console.log('⚠️ No customer email found');
       return;
     }
 
-    const subscriptionTier = getPlanNameFromPriceId(subscription.items.data[0].price.id);
+    console.log(`👤 Customer: ${customerName} (${customerEmail})`);
+
+    const priceId = subscription.items.data[0]?.price.id;
+    const subscriptionTier = getSubscriptionTier(priceId);
     
+    console.log(`💰 Subscription tier: ${subscriptionTier}`);
+
     await upsertSubscriber(
       customerEmail, 
-      subscription.customer, 
+      customerId, 
       subscriptionTier, 
-      subscription.id,
-      true, // is_active
-      new Date(subscription.current_period_end * 1000) // subscription_end
+      subscription.id, 
+      subscription.status === 'active', 
+      subscription.current_period_end ? new Date(subscription.current_period_end * 1000) : null,
+      customerName
     );
-
-    console.log('✅ Successfully processed subscription creation');
+    
   } catch (error) {
-    console.error('❌ Error processing subscription creation:', error);
+    console.error('❌ Error handling subscription created:', error);
     throw error;
   }
 }
@@ -222,34 +234,42 @@ async function handleSubscriptionDeleted(subscription) {
 }
 
 // Handle successful payment
-async function handlePaymentSucceeded(invoice) {
-  console.log('💰 Payment succeeded for invoice:', invoice.id);
-  
-  if (invoice.subscription) {
-    try {
-      const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
-      
-      // Generate new auth code for successful payment
-      const newAuthCode = generateAuthCode();
-      console.log(`🔢 Generated new auth code for successful payment: ${newAuthCode}`);
-      
-      const { error } = await supabase
-        .from('subscribers')
-        .update({ 
-          is_active: true,
-          subscribed: true,
-          subscription_end: new Date(subscription.current_period_end * 1000).toISOString(),
-          auth_code: newAuthCode,
-          updated_at: new Date().toISOString()
-        })
-        .eq('stripe_customer_id', subscription.customer);
-
-      if (error) throw error;
-      console.log('✅ Successfully updated subscription after payment');
-    } catch (error) {
-      console.error('❌ Error processing payment success:', error);
-      throw error;
+async function handlePaymentSucceeded(paymentIntent) {
+  try {
+    console.log('� Processing payment succeeded:', paymentIntent.id);
+    
+    const customerId = paymentIntent.customer;
+    if (!customerId) {
+      console.log('⚠️ No customer ID in payment intent');
+      return;
     }
+
+    const customer = await stripe.customers.retrieve(customerId);
+    const customerEmail = customer.email;
+    const customerName = customer.name;
+    
+    if (!customerEmail) {
+      console.log('⚠️ No customer email found');
+      return;
+    }
+
+    console.log(`👤 Customer: ${customerName} (${customerEmail})`);
+
+    // For payment succeeded, we'll update subscription as active
+    // The subscription tier should already be set from previous events
+    await upsertSubscriber(
+      customerEmail, 
+      customerId, 
+      'unknown', // Will be updated from subscription events
+      null, 
+      true, 
+      null,
+      customerName
+    );
+    
+  } catch (error) {
+    console.error('❌ Error handling payment succeeded:', error);
+    throw error;
   }
 }
 
@@ -326,7 +346,7 @@ async function upsertProfile(email, fullName, stripeCustomerId) {
 }
 
 // Create or update subscriber
-async function upsertSubscriber(email, stripeCustomerId, subscriptionTier, subscriptionId = null, isActive = true, subscriptionEnd = null) {
+async function upsertSubscriber(email, stripeCustomerId, subscriptionTier, subscriptionId = null, isActive = true, subscriptionEnd = null, customerName = null) {
   try {
     const subscriberData = {
       email,
@@ -347,6 +367,15 @@ async function upsertSubscriber(email, stripeCustomerId, subscriptionTier, subsc
       subscriberData.subscription_end = subscriptionEnd.toISOString();
     }
 
+    // Check if this is a new subscriber
+    const { data: existingSubscriber, error: fetchError } = await supabase
+      .from('subscribers')
+      .select('id, email')
+      .eq('email', email)
+      .single();
+
+    const isNewSubscriber = fetchError && fetchError.code === 'PGRST116'; // No rows found
+
     // Upsert subscriber (insert or update)
     const { error } = await supabase
       .from('subscribers')
@@ -357,6 +386,30 @@ async function upsertSubscriber(email, stripeCustomerId, subscriptionTier, subsc
 
     if (error) throw error;
     console.log('✅ Successfully upserted subscriber');
+
+    // Send welcome email for new active subscribers
+    if (isNewSubscriber && isActive && subscriberData.auth_code) {
+      try {
+        console.log(`📧 Sending welcome email to new subscriber: ${email}`);
+        const emailResult = await emailService.sendWelcomeEmail(
+          email, 
+          customerName, 
+          subscriberData.auth_code, 
+          subscriptionTier
+        );
+        
+        if (emailResult.success) {
+          console.log(`✅ Welcome email sent successfully to ${email}`);
+        } else {
+          console.error(`❌ Failed to send welcome email to ${email}:`, emailResult.error);
+          // Don't throw error - we don't want to fail the webhook for email issues
+        }
+      } catch (emailError) {
+        console.error(`❌ Error sending welcome email to ${email}:`, emailError);
+        // Don't throw error - we don't want to fail the webhook for email issues
+      }
+    }
+
   } catch (error) {
     console.error('❌ Error upserting subscriber:', error);
     throw error;
