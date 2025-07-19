@@ -7,8 +7,8 @@ const STRIPE_CONFIG = {
     // Add your PRICE IDs (not product IDs) from your Stripe dashboard
     // These should start with 'price_' not 'prod_'
     priceIds: {
-        monthly: 'price_YOUR_MONTHLY_PRICE_ID', // $149/month plan - replace with actual price ID
-        weekly: 'price_YOUR_WEEKLY_PRICE_ID'    // $189/month plan - replace with actual price ID
+        monthly: 'price_1RmQJhGOLHhy7CIrBCyjShQV', // $149/month plan - replace with actual price ID
+        weekly: 'price_1RmQL8GOLHhy7CIrM9Pxj86W'    // $189/month plan - replace with actual price ID
     }
 };
 
