@@ -1,11 +1,14 @@
 // Stripe Configuration
-// Replace with your actual Stripe publishable key
+// Uses environment variables for security
 const STRIPE_CONFIG = {
-    publishableKey: 'pk_live_51RZlAAGOLHhy7CIraslBhtePtrTJX8e4KSzjjJHXwtfvuJ9g7sRe43ydGPhcq3cvdr8QwlrXy17AWD4IqrFVLE8A00UJsBvbM9', // Replace with your actual publishable key
-    // Add your price IDs from your Stripe dashboard
+    // For Netlify, you can access build-time environment variables
+    // Set STRIPE_PUBLISHABLE_KEY in your Netlify environment variables
+    publishableKey: 'pk_live_51RZlAAGOLHhy7CIraslBhtePtrTJX8e4KSzjjJHXwtfvuJ9g7sRe43ydGPhcq3cvdr8QwlrXy17AWD4IqrFVLE8A00UJsBvbM9',
+    // Add your PRICE IDs (not product IDs) from your Stripe dashboard
+    // These should start with 'price_' not 'prod_'
     priceIds: {
-        monthly: 'prod_ShpzOEAMKArLqd', // $149/month plan
-        weekly: 'prod_Shq17Rno26yjtb'    // $189/month plan
+        monthly: 'price_YOUR_MONTHLY_PRICE_ID', // $149/month plan - replace with actual price ID
+        weekly: 'price_YOUR_WEEKLY_PRICE_ID'    // $189/month plan - replace with actual price ID
     }
 };
 

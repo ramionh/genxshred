@@ -6,8 +6,22 @@
 // composer require stripe/stripe-php
 require_once 'vendor/autoload.php';
 
-// Set your secret key (get this from your Stripe dashboard)
-\Stripe\Stripe::setApiKey(''); // Replace with your actual secret key
+// Set your secret key using environment variable
+// Set STRIPE_SECRET_KEY in your Netlify environment variables
+$stripeSecretKey = getenv('STRIPE_SECRET_KEY');
+
+if (!$stripeSecretKey) {
+    // Fallback to $_ENV if getenv() doesn't work
+    $stripeSecretKey = $_ENV['STRIPE_SECRET_KEY'] ?? null;
+}
+
+if (!$stripeSecretKey) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Stripe configuration error']);
+    exit;
+}
+
+\Stripe\Stripe::setApiKey($stripeSecretKey);
 
 // Set CORS headers for frontend requests
 header('Content-Type: application/json');
@@ -40,8 +54,8 @@ try {
             'quantity' => 1,
         ]],
         'mode' => 'subscription', // For recurring payments
-        'success_url' => 'https://yourdomain.com/success.html?session_id={CHECKOUT_SESSION_ID}',
-        'cancel_url' => 'https://yourdomain.com/coaching.html',
+        'success_url' => (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . '/success.html?session_id={CHECKOUT_SESSION_ID}',
+        'cancel_url' => (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . '/coaching.html',
         'metadata' => [
             'plan_name' => $planName
         ],
