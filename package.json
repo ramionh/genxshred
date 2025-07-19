@@ -1,0 +1,11 @@
+{
+  "name": "genxshred-stripe-integration",
+  "version": "1.0.0",
+  "description": "Stripe integration for Gen X Shred coaching plans",
+  "dependencies": {
+    "stripe": "^14.0.0"
+  },
+  "scripts": {
+    "build": "echo 'No build step required'"
+  }
+}

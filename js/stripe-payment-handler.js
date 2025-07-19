@@ -56,8 +56,8 @@ class StripePaymentHandler {
             // Show loading state
             this.setLoadingState(true);
 
-            // Create checkout session
-            const response = await fetch('/create-checkout-session', {
+            // Create checkout session using Netlify Function
+            const response = await fetch('/.netlify/functions/create-checkout-session', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -69,7 +69,8 @@ class StripePaymentHandler {
             });
 
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
             }
 
             const session = await response.json();
@@ -85,7 +86,7 @@ class StripePaymentHandler {
 
         } catch (error) {
             console.error('Error creating checkout session:', error);
-            this.showError('Unable to process payment. Please try again or contact support.');
+            this.showError(`Unable to process payment: ${error.message}. Please try again or contact support.`);
         } finally {
             this.setLoadingState(false);
         }
