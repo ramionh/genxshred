@@ -217,6 +217,7 @@ td, th {
 
 html {
   height: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -4237,6 +4238,22 @@ figcaption {
   display: flex;
 }
 
+/* Mobile-friendly services cards container */
+.services-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  width: 100%;
+}
+
+/* Mobile-friendly pricing cards container */
+.pricing-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  width: 100%;
+}
+
 .services_2nd-row_grid {
   grid-template-rows: auto;
   grid-template-columns: .5fr 1fr;
@@ -4562,6 +4579,17 @@ figcaption {
 
   .hide-tablet {
     display: none;
+  }
+
+  /* Tablet responsive adjustments for cards */
+  .services-cards-container {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .pricing-cards-container {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
   }
 
   .max-width-full-tablet {
@@ -4930,6 +4958,18 @@ figcaption {
 
   .services_1st-row_grid {
     grid-template-columns: 1fr;
+  }
+
+  /* Responsive adjustments for mobile services cards */
+  .services-cards-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  /* Responsive adjustments for mobile pricing cards */
+  .pricing-cards-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
   .services_image {
@@ -5468,6 +5508,24 @@ figcaption {
   .contact_card {
     padding-left: 10px;
     padding-right: 10px;
+  }
+
+  /* Additional mobile adjustments for services cards */
+  .services-cards-container {
+    gap: 1rem;
+  }
+
+  .services_card-wrapper {
+    padding: 20px;
+  }
+
+  /* Additional mobile adjustments for pricing cards */
+  .pricing-cards-container {
+    gap: 1rem;
+  }
+
+  .contact_card {
+    padding: 20px;
   }
 
   .hor-wrapper._15px {
