@@ -253,6 +253,167 @@
         .no-scrollbar::-webkit-scrollbar {
           display: none;
         }
+
+        /* How It Works Carousel Styles */
+        .carousel-container {
+          position: relative;
+          max-width: 900px;
+          margin: 0 auto;
+          overflow: hidden;
+          border-radius: 15px;
+          background: #151515;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .carousel-track {
+          display: flex;
+          transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-slide {
+          min-width: 100%;
+          display: flex;
+          flex-direction: column;
+          opacity: 0;
+          transition: opacity 0.5s ease-in-out;
+        }
+
+        .carousel-slide.active {
+          opacity: 1;
+        }
+
+        .carousel-image-wrapper {
+          width: 100%;
+          height: 720px;
+          overflow: hidden;
+          position: relative;
+          background: #222;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .carousel-image {
+          width: 500px;
+          height: 700px;
+          object-fit: cover;
+          object-position: center top;
+          border-radius: 12px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .carousel-image.motivation-image {
+          width: 750px;
+          height: 500px;
+        }
+
+        .carousel-content {
+          padding: 30px;
+          text-align: center;
+          background: #151515;
+        }
+
+        .carousel-content h3 {
+          color: #4d65ff;
+          margin-bottom: 15px;
+          font-size: 1.5rem;
+        }
+
+        .carousel-content p {
+          color: #fff;
+          line-height: 1.6;
+          font-size: 1rem;
+        }
+
+        .carousel-dots {
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+          padding: 20px;
+          background: #151515;
+        }
+
+        .carousel-dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          border: none;
+          background: #555;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+        }
+
+        .carousel-dot.active,
+        .carousel-dot:hover {
+          background: #4d65ff;
+        }
+
+        .carousel-arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          background: rgba(77, 101, 255, 0.8);
+          border: none;
+          color: white;
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background-color 0.3s ease;
+          z-index: 10;
+        }
+
+        .carousel-arrow:hover {
+          background: rgba(77, 101, 255, 1);
+        }
+
+        .carousel-arrow-prev {
+          left: 20px;
+        }
+
+        .carousel-arrow-next {
+          right: 20px;
+        }
+
+        /* Mobile responsive */
+        @media screen and (max-width: 767px) {
+          .carousel-image-wrapper {
+            height: 400px;
+          }
+
+          .carousel-image {
+            width: 280px;
+            height: 350px;
+          }
+
+          .carousel-content {
+            padding: 20px;
+          }
+
+          .carousel-content h3 {
+            font-size: 1.25rem;
+          }
+
+          .carousel-content p {
+            font-size: 0.9rem;
+          }
+
+          .carousel-arrow {
+            width: 40px;
+            height: 40px;
+          }
+
+          .carousel-arrow-prev {
+            left: 10px;
+          }
+
+          .carousel-arrow-next {
+            right: 10px;
+          }
+        }
       </style>
     </div>
     <main class="main-wrapper">
@@ -392,6 +553,129 @@
           </div>
         </div>
       </section>
+
+      <!-- How It Works Carousel Section -->
+      <section id="how-it-works" class="section_how-it-works">
+        <div class="padding-global">
+          <div class="container-large">
+            <div class="padding-section-large">
+              <div class="max-width-large align-center text-align-center">
+                <h2 class="heading-style-h2">Rewiring Your Mind for Lasting Transformation</h2>
+                <div class="spacer-medium"></div>
+                <p class="text-size-medium">Through evidence-based motivational interviewing, strategic habit formation, and cutting-edge technology, we help you overcome internal resistance and create sustainable behavioral change</p>
+                <div class="spacer-large"></div>
+                
+                <div class="carousel-container">
+                  <div class="carousel-track" id="carouselTrack">
+                    
+                    <!-- Slide 1: Dashboard -->
+                    <div class="carousel-slide active">
+                      <div class="carousel-image-wrapper">
+                        <img src="images/dashboard.png" alt="GenX Shred Dashboard" class="carousel-image" />
+                      </div>
+                      <div class="carousel-content">
+                        <h3 class="heading-style-h4">1. Track Your Progress</h3>
+                        <p>Start with your personalized dashboard that tracks sleep quality, nutrition, exercise, and overall wellness metrics. Get a complete overview of your health journey.</p>
+                      </div>
+                    </div>
+
+                    <!-- Slide 2: Habit Assessment -->
+                    <div class="carousel-slide">
+                      <div class="carousel-image-wrapper">
+                        <img src="images/Healthy_Habits.png" alt="Health Habit Identifier" class="carousel-image" />
+                      </div>
+                      <div class="carousel-content">
+                        <h3 class="heading-style-h4">2. Identify Your Focus Areas</h3>
+                        <p>Choose from the 5 Core Principles (Sleep, Calorie Intake, Protein Intake, Adaptive Training, Lifestyle Guardrails) to identify areas for improvement.</p>
+                      </div>
+                    </div>
+
+                    <!-- Slide 3: Habit Assessment -->
+                    <div class="carousel-slide">
+                      <div class="carousel-image-wrapper">
+                        <img src="images/heathy_habit_identifier.png" alt="Sleep Habits Assessment" class="carousel-image" />
+                      </div>
+                      <div class="carousel-content">
+                        <h3 class="heading-style-h4">3. Assess Your Habits</h3>
+                        <p>Take detailed assessments for each principle. Answer questions about your current habits to get personalized recommendations.</p>
+                      </div>
+                    </div>
+
+                    <!-- Slide 4: Core Habits Rating -->
+                    <div class="carousel-slide">
+                      <div class="carousel-image-wrapper">
+                        <img src="images/Core_Habits.png" alt="Core Habits Assessment" class="carousel-image" />
+                      </div>
+                      <div class="carousel-content">
+                        <h3 class="heading-style-h4">4. Rate Your Core Habits</h3>
+                        <p>Evaluate your current habits with our color-coded system. Green means you're doing well, yellow needs improvement, and red needs work.</p>
+                      </div>
+                    </div>
+
+                    <!-- Slide 5: Goal Setting -->
+                    <div class="carousel-slide">
+                      <div class="carousel-image-wrapper">
+                        <img src="images/goals.png" alt="Goal Setting" class="carousel-image" />
+                      </div>
+                      <div class="carousel-content">
+                        <h3 class="heading-style-h4">5. Set Transformation Goals</h3>
+                        <p>Define your fitness goals with our body type classification system. Move up one level in the next 90 days with automatic tracking and management.</p>
+                      </div>
+                    </div>
+
+                    <!-- Slide 6: Progress Tracking -->
+                    <div class="carousel-slide">
+                      <div class="carousel-image-wrapper">
+                        <img src="images/progress.png" alt="Progress Tracking" class="carousel-image" />
+                      </div>
+                      <div class="carousel-content">
+                        <h3 class="heading-style-h4">6. Monitor Your Journey</h3>
+                        <p>Track weekly check-ins with weight, body fat measurements, and progress photos. See your transformation unfold with detailed metrics and visual progress.</p>
+                      </div>
+                    </div>
+
+                    <!-- Slide 7: Find Your Motivation -->
+                    <div class="carousel-slide">
+                      <div class="carousel-image-wrapper">
+                        <img src="images/Motivation.png" alt="Find Your Motivation" class="carousel-image motivation-image" />
+                      </div>
+                      <div class="carousel-content">
+                        <h3 class="heading-style-h4">7. Find Your Motivation</h3>
+                        <p>Access over 100 Board Certified motivational interviewing exercises designed to reinforce your internal drive to achieve your fitness goals. Build unshakeable motivation from within.</p>
+                      </div>
+                    </div>
+
+                  </div>
+                  
+                  <!-- Navigation Dots -->
+                  <div class="carousel-dots">
+                    <button class="carousel-dot active" onclick="goToSlide(0)"></button>
+                    <button class="carousel-dot" onclick="goToSlide(1)"></button>
+                    <button class="carousel-dot" onclick="goToSlide(2)"></button>
+                    <button class="carousel-dot" onclick="goToSlide(3)"></button>
+                    <button class="carousel-dot" onclick="goToSlide(4)"></button>
+                    <button class="carousel-dot" onclick="goToSlide(5)"></button>
+                    <button class="carousel-dot" onclick="goToSlide(6)"></button>
+                  </div>
+
+                  <!-- Navigation Arrows -->
+                  <button class="carousel-arrow carousel-arrow-prev" onclick="previousSlide()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                  <button class="carousel-arrow carousel-arrow-next" onclick="nextSlide()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="body-type" class="section_body-type">
         <div class="padding-global">
           <div class="container-large">
@@ -1069,6 +1353,123 @@
   </div>
   <script src="js/jquery.js?site=66da12845dc932214d8bd04d" type="text/javascript"></script>
   <script src="js/webflow-script.js" type="text/javascript"></script>
+  
+  <!-- How It Works Carousel JavaScript -->
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.carousel-dot');
+    const totalSlides = slides.length;
+
+    function updateCarousel() {
+      // Hide all slides
+      slides.forEach((slide, index) => {
+        slide.classList.remove('active');
+        if (index === currentSlide) {
+          slide.classList.add('active');
+        }
+      });
+
+      // Update dots
+      dots.forEach((dot, index) => {
+        dot.classList.remove('active');
+        if (index === currentSlide) {
+          dot.classList.add('active');
+        }
+      });
+
+      // Move carousel track
+      const track = document.getElementById('carouselTrack');
+      const translateX = -currentSlide * 100;
+      track.style.transform = `translateX(${translateX}%)`;
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      updateCarousel();
+    }
+
+    function autoAdvance() {
+      // Check if we're on the last slide (step 7, index 6)
+      if (currentSlide === totalSlides - 1) {
+        // Pause for 5 seconds on the last slide before starting over
+        setTimeout(() => {
+          nextSlide();
+          startAutoAdvance(); // Restart the normal interval
+        }, 5000);
+      } else {
+        nextSlide();
+        startAutoAdvance(); // Continue with normal interval
+      }
+    }
+
+    function startAutoAdvance() {
+      // Clear any existing interval
+      if (window.carouselInterval) {
+        clearTimeout(window.carouselInterval);
+      }
+      
+      // Set next auto-advance
+      if (currentSlide === totalSlides - 1) {
+        // We're on the last slide, so the next advance will be delayed
+        window.carouselInterval = setTimeout(autoAdvance, 6000);
+      } else {
+        // Normal timing for other slides
+        window.carouselInterval = setTimeout(autoAdvance, 6000);
+      }
+    }
+
+    function previousSlide() {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      updateCarousel();
+    }
+
+    function goToSlide(slideIndex) {
+      currentSlide = slideIndex;
+      updateCarousel();
+    }
+
+    // Initialize carousel and start auto-advance
+    document.addEventListener('DOMContentLoaded', function() {
+      updateCarousel();
+      startAutoAdvance();
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowLeft') {
+        previousSlide();
+      } else if (e.key === 'ArrowRight') {
+        nextSlide();
+      }
+    });
+
+    // Touch/swipe support for mobile
+    let startX = 0;
+    let endX = 0;
+
+    document.addEventListener('touchstart', function(e) {
+      startX = e.touches[0].clientX;
+    });
+
+    document.addEventListener('touchend', function(e) {
+      endX = e.changedTouches[0].clientX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      const diffX = startX - endX;
+
+      if (Math.abs(diffX) > swipeThreshold) {
+        if (diffX > 0) {
+          nextSlide(); // Swipe left, go to next
+        } else {
+          previousSlide(); // Swipe right, go to previous
+        }
+      }
+    }
+  </script>
 </body>
 
 </html>
